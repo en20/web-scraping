@@ -115,93 +115,199 @@ def login_vadu():
         search_button.click()
         
         # Wait for search results to load
-        time.sleep(3)
+        time.sleep(10)  # Increased wait time as in main2.py
         
-        # Click on the first link
+        # Click on the first link (Estadual)
         first_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/ul/li[6]/a"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendarios']"))
         )
         first_link.click()
-        
-        # Wait for the page to load
-        time.sleep(2)
+        time.sleep(3)
         
         # Click on the second link
         second_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/ul/li[2]/a"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabInstanciasProcessosLendarios']"))
         )
         second_link.click()
-        
-        # Wait for the page to load
-        time.sleep(2)
+        time.sleep(3)
         
         # Click on the third link
         third_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[1]/div/div/ul/li[2]/a"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEstaduais']"))
         )
         third_link.click()
+        time.sleep(3)
         
-        # Wait for the page to load
-        time.sleep(2)
-        
-        # Click on the select element
+        # Select the dropdown option for Estadual
         select_element = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[1]/div/label/select"))
+            EC.element_to_be_clickable((By.NAME, "tabelaProcessosEstaduais_length"))
         )
         select_element.click()
-        
-        # Wait a moment
         time.sleep(1)
         
-        # Click on the option
+        # Select the 4th option
         option = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[1]/div/label/select/option[4]"))
+            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosEstaduais_length']/option[4]"))
         )
         option.click()
+        time.sleep(5)
         
         # Save first table (Estadual)
         save_table_to_csv(
             driver,
-            "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[1]/div/div/div/div[2]/div/div[2]/div[2]/div[2]/div/table",
+            "//table[@id='tabelaProcessosEstaduais']",
             "estadual.csv"
         )
+        time.sleep(5)
         
-        # Click on the fourth link
+        # Click on the fourth link (Trabalhista)
         fourth_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[1]/ul/li[2]/a"))
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaTrabalhista']"))
         )
         fourth_link.click()
+        time.sleep(5)
         
-        # Wait for the page to load
-        time.sleep(2)
+        # Click on the fifth link
+        fifth_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosTrabalhista']"))
+        )
+        fifth_link.click()
+        time.sleep(5)
         
-        # Click on the select element
+        # Select the dropdown option for Trabalhista
         select_element = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[1]/div/label/select"))
+            EC.element_to_be_clickable((By.NAME, "tabelaProcessosTrabalhistas_length"))
         )
         select_element.click()
-        
-        # Wait a moment
         time.sleep(1)
         
-        # Click on the option
+        # Select the 4th option
         option = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[1]/div/label/select/option[4]"))
+            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosTrabalhistas_length']/option[4]"))
         )
         option.click()
+        time.sleep(5)
         
         # Save second table (Trabalhista)
         save_table_to_csv(
             driver,
-            "/html/body/div[2]/div[3]/div/div[4]/div[3]/div/div/div[10]/div/div/div/div[3]/div[2]/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div[2]/div[2]/div/table",
+            "//table[@id='tabelaProcessosTrabalhistas']",
             "trabalhista.csv"
         )
+        time.sleep(5)
         
-        # Wait for a moment to see the result
+        # Click on the sixth link (Federal)
+        sixth_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaFederal']"))
+        )
+        sixth_link.click()
+        time.sleep(5)
+        
+        # Click on the seventh link
+        seventh_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosFederal']"))
+        )
+        seventh_link.click()
+        time.sleep(5)
+        
+        # Select the dropdown option for Federal
+        select_element = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, "tabelaProcessosFederais_length"))
+        )
+        select_element.click()
+        time.sleep(1)
+        
+        # Select the 4th option
+        option = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosFederais_length']/option[4]"))
+        )
+        option.click()
+        time.sleep(5)
+        
+        # Save third table (Federal)
+        save_table_to_csv(
+            driver,
+            "//table[@id='tabelaProcessosFederais']",
+            "federais.csv"
+        )
+        time.sleep(5)
+        
+        # Click on the eighth link (Eleitoral)
+        eighth_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaEleitoral']"))
+        )
+        eighth_link.click()
+        time.sleep(5)
+        
+        # Click on the ninth link
+        ninth_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEleitoral']"))
+        )
+        ninth_link.click()
+        time.sleep(5)
+        
+        # Select the dropdown option for Eleitoral
+        select_element = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, "tabelaProcessosEleitorais_length"))
+        )
+        select_element.click()
+        time.sleep(1)
+        
+        # Select the 4th option
+        option = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosEleitorais_length']/option[4]"))
+        )
+        option.click()
+        time.sleep(5)
+        
+        # Save fourth table (Eleitoral)
+        save_table_to_csv(
+            driver,
+            "//table[@id='tabelaProcessosEleitorais']",
+            "eleitorais.csv"
+        )
+        time.sleep(5)
+        
+        # Click on the tenth link (Militar)
+        tenth_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaMilitar']"))
+        )
+        tenth_link.click()
+        time.sleep(5)
+        
+        # Click on the eleventh link
+        eleventh_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosMilitar']"))
+        )
+        eleventh_link.click()
+        time.sleep(5)
+        
+        # Select the dropdown option for Militar
+        select_element = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.NAME, "tabelaProcessosMilitares_length"))
+        )
+        select_element.click()
+        time.sleep(1)
+        
+        # Select the 4th option
+        option = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosMilitares_length']/option[4]"))
+        )
+        option.click()
+        time.sleep(5)
+        
+        # Save fifth table (Militar)
+        save_table_to_csv(
+            driver,
+            "//table[@id='tabelaProcessosMilitares']",
+            "militar.csv"
+        )
         time.sleep(5)
         
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        print("Browser will remain open for inspection...")
+        time.sleep(300)  # Keep browser open for 5 minutes in case of error
     
     finally:
         # Close the browser
