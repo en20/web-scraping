@@ -14,9 +14,13 @@ def save_table_to_csv(driver, xpath, table_type, filename):
         time.sleep(5)
         
         # Get the table element with explicit wait
-        table = WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.XPATH, xpath))
-        )
+        try:
+            table = WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.XPATH, xpath))
+            )
+        except:
+            print(f"Nenhum dado encontrado para a tabela {table_type}")
+            return
         
         # Get all rows from the table
         rows = table.find_elements(By.TAG_NAME, "tr")
@@ -40,6 +44,47 @@ def save_table_to_csv(driver, xpath, table_type, filename):
     except Exception as e:
         print(f"Erro ao salvar tabela {table_type}: {str(e)}")
 
+def check_table_exists(driver, table_id):
+    try:
+        # Tenta encontrar a tabela
+        table = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.ID, table_id))
+        )
+        return True
+    except:
+        return False
+
+def process_table(driver, table_id, table_type, filename):
+    try:
+        # Verifica se a tabela existe
+        if not check_table_exists(driver, table_id):
+            print(f"Tabela {table_type} não encontrada ou sem registros")
+            return
+        
+        # Select the dropdown option
+        select_element = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.NAME, f"{table_id}_length"))
+        )
+        select_element.click()
+        time.sleep(3)
+        
+        # Select the 4th option (100 entries)
+        option = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.XPATH, f"//select[@name='{table_id}_length']/option[4]"))
+        )
+        option.click()
+        time.sleep(5)
+        
+        # Save table
+        save_table_to_csv(
+            driver,
+            f"//table[@id='{table_id}']",
+            table_type,
+            filename
+        )
+        time.sleep(3)
+    except Exception as e:
+        print(f"Erro ao processar tabela {table_type}: {str(e)}")
 
 def process_cnpj(driver, cnpj):
     try:
@@ -75,202 +120,114 @@ def process_cnpj(driver, cnpj):
         # Wait for search results to load
         time.sleep(10)
         
-        # Click on the first link (Estadual)
-        first_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendarios']"))
-        )
-        first_link.click()
-        time.sleep(3)
+        # Verificar se há mensagem de "Nenhum registro encontrado"
+        try:
+            no_records = driver.find_element(By.XPATH, "//div[contains(text(), 'Nenhum registro encontrado')]")
+            if no_records.is_displayed():
+                print(f"Nenhum registro encontrado para o CNPJ {cnpj}")
+                return
+        except:
+            pass  # Se não encontrar a mensagem, continua normalmente
         
-        # Click on the second link
-        second_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabInstanciasProcessosLendarios']"))
-        )
-        second_link.click()
-        time.sleep(3)
+        # Processar tabela Estadual
+        try:
+            first_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendarios']"))
+            )
+            first_link.click()
+            time.sleep(3)
+            
+            second_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabInstanciasProcessosLendarios']"))
+            )
+            second_link.click()
+            time.sleep(3)
+            
+            third_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEstaduais']"))
+            )
+            third_link.click()
+            time.sleep(3)
+            
+            process_table(driver, "tabelaProcessosEstaduais", "Estadual", filename)
+        except Exception as e:
+            print(f"Erro ao acessar aba Estadual: {str(e)}")
         
-        # Click on the third link
-        third_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEstaduais']"))
-        )
-        third_link.click()
-        time.sleep(3)
+        # Processar tabela Trabalhista
+        try:
+            fourth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaTrabalhista']"))
+            )
+            fourth_link.click()
+            time.sleep(3)
+            
+            fifth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosTrabalhista']"))
+            )
+            fifth_link.click()
+            time.sleep(3)
+            
+            process_table(driver, "tabelaProcessosTrabalhistas", "Trabalhista", filename)
+        except Exception as e:
+            print(f"Erro ao acessar aba Trabalhista: {str(e)}")
         
-        # Select the dropdown option for Estadual
-        select_element = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.NAME, "tabelaProcessosEstaduais_length"))
-        )
-        select_element.click()
-        time.sleep(3)
+        # Processar tabela Federal
+        try:
+            sixth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaFederal']"))
+            )
+            sixth_link.click()
+            time.sleep(3)
+            
+            seventh_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosFederal']"))
+            )
+            seventh_link.click()
+            time.sleep(3)
+            
+            process_table(driver, "tabelaProcessosFederais", "Federal", filename)
+        except Exception as e:
+            print(f"Erro ao acessar aba Federal: {str(e)}")
         
-        # Select the 4th option (100 entries)
-        option = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosEstaduais_length']/option[4]"))
-        )
-        option.click()
-        time.sleep(5)
+        # Processar tabela Eleitoral
+        try:
+            eighth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaEleitoral']"))
+            )
+            eighth_link.click()
+            time.sleep(3)
+            
+            ninth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEleitoral']"))
+            )
+            ninth_link.click()
+            time.sleep(3)
+            
+            process_table(driver, "tabelaProcessosEleitorais", "Eleitoral", filename)
+        except Exception as e:
+            print(f"Erro ao acessar aba Eleitoral: {str(e)}")
         
-        # Save first table (Estadual)
-        save_table_to_csv(
-            driver,
-            "//table[@id='tabelaProcessosEstaduais']",
-            "Estadual",
-            filename
-        )
-        time.sleep(3)
-        
-        # Click on the fourth link (Trabalhista)
-        fourth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaTrabalhista']"))
-        )
-        fourth_link.click()
-        time.sleep(3)
-        
-        # Click on the fifth link
-        fifth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosTrabalhista']"))
-        )
-        fifth_link.click()
-        time.sleep(3)
-        
-        # Select the dropdown option for Trabalhista
-        select_element = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.NAME, "tabelaProcessosTrabalhistas_length"))
-        )
-        select_element.click()
-        time.sleep(3)
-        
-        # Select the 4th option
-        option = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosTrabalhistas_length']/option[4]"))
-        )
-        option.click()
-        time.sleep(5)
-        
-        # Save second table (Trabalhista)
-        save_table_to_csv(
-            driver,
-            "//table[@id='tabelaProcessosTrabalhistas']",
-            "Trabalhista",
-            filename
-        )
-        time.sleep(3)
-        
-        # Click on the sixth link (Federal)
-        sixth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaFederal']"))
-        )
-        sixth_link.click()
-        time.sleep(3)
-        
-        # Click on the seventh link
-        seventh_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosFederal']"))
-        )
-        seventh_link.click()
-        time.sleep(3)
-        
-        # Select the dropdown option for Federal
-        select_element = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.NAME, "tabelaProcessosFederais_length"))
-        )
-        select_element.click()
-        time.sleep(3)
-        
-        # Select the 4th option
-        option = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosFederais_length']/option[4]"))
-        )
-        option.click()
-        time.sleep(3)
-        
-        # Save third table (Federal)
-        save_table_to_csv(
-            driver,
-            "//table[@id='tabelaProcessosFederais']",
-            "Federal",
-            filename
-        )
-        time.sleep(3)
-        
-        # Click on the eighth link (Eleitoral)
-        eighth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaEleitoral']"))
-        )
-        eighth_link.click()
-        time.sleep(3)
-        
-        # Click on the ninth link
-        ninth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosEleitoral']"))
-        )
-        ninth_link.click()
-        time.sleep(3)
-        
-        # Select the dropdown option for Eleitoral
-        select_element = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.NAME, "tabelaProcessosEleitorais_length"))
-        )
-        select_element.click()
-        time.sleep(3)
-        
-        # Select the 4th option
-        option = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosEleitorais_length']/option[4]"))
-        )
-        option.click()
-        time.sleep(3)
-        
-        # Save fourth table (Eleitoral)
-        save_table_to_csv(
-            driver,
-            "//table[@id='tabelaProcessosEleitorais']",
-            "Eleitoral",
-            filename
-        )
-        time.sleep(3)
-        
-        # Click on the tenth link (Militar)
-        tenth_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaMilitar']"))
-        )
-        tenth_link.click()
-        time.sleep(3)
-        
-        # Click on the eleventh link
-        eleventh_link = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosMilitar']"))
-        )
-        eleventh_link.click()
-        time.sleep(3)
-        
-        # Select the dropdown option for Militar
-        select_element = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.NAME, "tabelaProcessosMilitares_length"))
-        )
-        select_element.click()
-        time.sleep(3)
-        
-        # Select the 4th option
-        option = WebDriverWait(driver, 20).until(
-            EC.element_to_be_clickable((By.XPATH, "//select[@name='tabelaProcessosMilitares_length']/option[4]"))
-        )
-        option.click()
-        time.sleep(3)
-        
-        # Save fifth table (Militar)
-        save_table_to_csv(
-            driver,
-            "//table[@id='tabelaProcessosMilitares']",
-            "Militar",
-            filename
-        )
-        time.sleep(3)
+        # Processar tabela Militar
+        try:
+            tenth_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosInstanciaMilitar']"))
+            )
+            tenth_link.click()
+            time.sleep(3)
+            
+            eleventh_link = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "a[href='#tabProcessosLendariosMilitar']"))
+            )
+            eleventh_link.click()
+            time.sleep(3)
+            
+            process_table(driver, "tabelaProcessosMilitares", "Militar", filename)
+        except Exception as e:
+            print(f"Erro ao acessar aba Militar: {str(e)}")
         
     except Exception as e:
         print(f"Erro ao processar CNPJ {cnpj}: {str(e)}")
-        print("Browser will remain open for inspection...")
-        time.sleep(300)  # Keep browser open for 5 minutes in case of error
+        raise  # Re-lança a exceção para ser capturada pelo loop principal
 
 
 def login_vadu():
@@ -289,7 +246,6 @@ def login_vadu():
     driver = webdriver.Chrome(options=options, service=service)
     
     try:
-        
         # Navigate to the login page
         driver.get("https://www.vadu.com.br/vadu.dll/Autenticacao/Entrar/")
         
@@ -334,12 +290,60 @@ def login_vadu():
         
         # Wait for the page to stabilize after closing modals
         time.sleep(2)
-        cnpjs = ["51.414.521/0001-26","17.713.930/0001-95"]
+        
+        # Ler CNPJs do arquivo CSV
+        cnpjs = []
+        try:
+            with open('cnpjs.csv', 'r', encoding='utf-8') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)  # Pula o cabeçalho
+                for row in csv_reader:
+                    if row and row[0].strip():  # Verifica se a linha não está vazia
+                        cnpjs.append(row[0].strip())
+        except Exception as e:
+            print(f"Erro ao ler arquivo cnpjs.csv: {str(e)}")
+            return
+        
+        if not cnpjs:
+            print("Nenhum CNPJ encontrado no arquivo cnpjs.csv")
+            return
+        
+        print(f"Total de CNPJs encontrados: {len(cnpjs)}")
+        
+        # Lista para armazenar os CNPJs que falharam
+        failed_cnpjs = []
+        
         for cnpj in cnpjs:
-            process_cnpj(driver,cnpj)
+            try:
+                print(f"\nIniciando processamento do CNPJ: {cnpj}")
+                process_cnpj(driver, cnpj)
+                print(f"Processamento do CNPJ {cnpj} concluído com sucesso!")
+            except Exception as e:
+                error_msg = f"Erro ao processar CNPJ {cnpj}: {str(e)}"
+                print(f"\n{'='*50}")
+                print(error_msg)
+                print(f"{'='*50}\n")
+                failed_cnpjs.append((cnpj, str(e)))
+                continue
+        
+        # Relatório final
+        print("\n" + "="*50)
+        print("RELATÓRIO DE PROCESSAMENTO")
+        print("="*50)
+        print(f"Total de CNPJs processados: {len(cnpjs)}")
+        print(f"CNPJs processados com sucesso: {len(cnpjs) - len(failed_cnpjs)}")
+        print(f"CNPJs com falha: {len(failed_cnpjs)}")
+        
+        if failed_cnpjs:
+            print("\nDetalhes das falhas:")
+            for cnpj, error in failed_cnpjs:
+                print(f"\nCNPJ: {cnpj}")
+                print(f"Erro: {error}")
+        
+        print("\n" + "="*50)
         
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        print(f"Erro crítico durante a execução: {str(e)}")
         print("Browser will remain open for inspection...")
         time.sleep(300)  # Keep browser open for 5 minutes in case of error
     
