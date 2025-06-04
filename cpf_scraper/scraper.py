@@ -17,7 +17,7 @@ def process_cpf(driver, cpf):
     try:
         # Create filename by removing special characters from CPF
         clean_cpf = cpf.replace('.', '').replace('-', '')
-        filename = f"cpf_scraper/output/{clean_cpf}_dados.csv"
+        filename = f"output/{clean_cpf}_dados.csv"
         
         # Ensure output directory exists
         os.makedirs(os.path.dirname(filename), exist_ok=True)

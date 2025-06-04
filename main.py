@@ -1,7 +1,7 @@
 import time
 import csv
 import os
-from utils import login_vadu
+from utils.utils import login_vadu
 from cpf_scraper.scraper import process_cpf
 from cnpj_scraper.scraper import process_cnpj
 
@@ -19,11 +19,11 @@ def main():
         
         # Read the appropriate file based on search type
         if search_type == '1':
-            filename = 'cpf_scraper/input/cpfs.csv'
+            filename = 'input/cpfs.csv'
             search_type_name = 'CPF'
             process_func = process_cpf
         else:
-            filename = 'cnpj_scraper/input/cnpjs.csv'
+            filename = 'input/cnpjs.csv'
             search_type_name = 'CNPJ'
             process_func = process_cnpj
         

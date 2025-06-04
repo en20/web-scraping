@@ -17,7 +17,7 @@ def process_cnpj(driver, cnpj):
     try:
         # Create filename by removing special characters from CNPJ
         clean_cnpj = cnpj.replace('.', '').replace('/', '').replace('-', '')
-        filename = f"cnpj_scraper/output/{clean_cnpj}_dados.csv"
+        filename = f"output/{clean_cnpj}_dados.csv"
         
         # Ensure output directory exists
         os.makedirs(os.path.dirname(filename), exist_ok=True)
