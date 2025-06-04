@@ -1,7 +1,7 @@
 import time
 import csv
 import os
-from utils.utils import login_vadu
+from utils import login_vadu
 from cpf_scraper.scraper import process_cpf
 from cnpj_scraper.scraper import process_cnpj
 
@@ -56,8 +56,16 @@ def main():
         for item in items:
             try:
                 print(f"\nIniciando processamento do {search_type_name}: {item}")
-                process_func(driver, item)
+                has_error = process_func(driver, item)
                 print(f"Processamento do {search_type_name} {item} concluído com sucesso!")
+                
+                if has_error:
+                    error_msg = f"Erro ao processar {search_type_name} {item}"
+                    print(f"\n{'='*50}")
+                    print(error_msg)
+                    print(f"{'='*50}\n")
+                    failed_items.append((item, str(e)))
+                    
             except Exception as e:
                 error_msg = f"Erro ao processar {search_type_name} {item}: {str(e)}"
                 print(f"\n{'='*50}")

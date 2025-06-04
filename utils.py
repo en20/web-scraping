@@ -110,11 +110,12 @@ def process_table(driver, table_id, table_type, filename):
         table_type: Type of the table (e.g., "Estadual", "Federal")
         filename: Name of the CSV file to save the data
     """
+    has_error = False
     try:
         # Verifica se a tabela existe
         if not check_table_exists(driver, table_id):
-            print(f"Tabela {table_type} não encontrada ou sem registros")
-            return
+            print(f"Tabela {table_type} não encontrada")
+            return True
         
         # Select the dropdown option
         select_element = WebDriverWait(driver, 20).until(
@@ -140,6 +141,9 @@ def process_table(driver, table_id, table_type, filename):
         time.sleep(3)
     except Exception as e:
         print(f"Erro ao processar tabela {table_type}: {str(e)}")
+        has_error = True
+    
+    return has_error
 
 def save_table_to_csv(driver, xpath, table_type, filename):
     """
@@ -194,6 +198,7 @@ def process_all_tables(driver, filename):
         driver: WebDriver instance
         filename: Name of the CSV file to save the data
     """
+    has_error = False
     # Processar tabela Estadual
     try:
         first_link = WebDriverWait(driver, 20).until(
@@ -217,6 +222,7 @@ def process_all_tables(driver, filename):
         process_table(driver, "tabelaProcessosEstaduais", "Estadual", filename)
     except Exception as e:
         print(f"Erro ao acessar aba Estadual: {str(e)}")
+        has_error = True
     
     # Processar tabela Trabalhista
     try:
@@ -235,6 +241,7 @@ def process_all_tables(driver, filename):
         process_table(driver, "tabelaProcessosTrabalhistas", "Trabalhista", filename)
     except Exception as e:
         print(f"Erro ao acessar aba Trabalhista: {str(e)}")
+        has_error = True
     
     # Processar tabela Federal
     try:
@@ -253,6 +260,7 @@ def process_all_tables(driver, filename):
         process_table(driver, "tabelaProcessosFederais", "Federal", filename)
     except Exception as e:
         print(f"Erro ao acessar aba Federal: {str(e)}")
+        has_error = True
     
     # Processar tabela Eleitoral
     try:
@@ -271,6 +279,7 @@ def process_all_tables(driver, filename):
         process_table(driver, "tabelaProcessosEleitorais", "Eleitoral", filename)
     except Exception as e:
         print(f"Erro ao acessar aba Eleitoral: {str(e)}")
+        has_error = True
     
     # Processar tabela Militar
     try:
@@ -289,3 +298,6 @@ def process_all_tables(driver, filename):
         process_table(driver, "tabelaProcessosMilitares", "Militar", filename)
     except Exception as e:
         print(f"Erro ao acessar aba Militar: {str(e)}")
+        has_error = True
+        
+    return has_error

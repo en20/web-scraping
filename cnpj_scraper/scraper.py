@@ -60,7 +60,7 @@ def process_cnpj(driver, cnpj):
             pass  # Se não encontrar a mensagem, continua normalmente
         
         # Process all tables
-        process_all_tables(driver, filename)
+        return process_all_tables(driver, filename)
         
     except Exception as e:
         print(f"Erro ao processar CNPJ {cnpj}: {str(e)}")
