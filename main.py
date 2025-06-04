@@ -6,10 +6,10 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import csv
-from datetime import datetime
-from vadutils import login_vadu
-from cpf import process_cpf
-from cnpj import process_cnpj
+import os
+from utils.utils import login_vadu
+from cpf_scraper.scraper import process_cpf
+from cnpj_scraper.scraper import process_cnpj
 
 def save_table_to_csv(driver, xpath, table_type, filename):
     try:
@@ -244,8 +244,17 @@ def main():
             print("Opção inválida. Por favor, digite 1 para CPF ou 2 para CNPJ.")
         
         # Read the appropriate file based on search type
-        filename = 'cpfs.csv' if search_type == '1' else 'cnpjs.csv'
-        search_type_name = 'CPF' if search_type == '1' else 'CNPJ'
+        if search_type == '1':
+            filename = 'cpf_scraper/input/cpfs.csv'
+            search_type_name = 'CPF'
+            process_func = process_cpf
+        else:
+            filename = 'cnpj_scraper/input/cnpjs.csv'
+            search_type_name = 'CNPJ'
+            process_func = process_cnpj
+        
+        # Ensure input directory exists
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         
         # Read the file
         items = []
@@ -273,10 +282,7 @@ def main():
         for item in items:
             try:
                 print(f"\nIniciando processamento do {search_type_name}: {item}")
-                if search_type == '1':
-                    process_cpf(driver, item)
-                else:
-                    process_cnpj(driver, item)
+                process_func(driver, item)
                 print(f"Processamento do {search_type_name} {item} concluído com sucesso!")
             except Exception as e:
                 error_msg = f"Erro ao processar {search_type_name} {item}: {str(e)}"
