@@ -93,7 +93,7 @@ def check_table_exists(driver, table_id):
         bool: True if table exists, False otherwise
     """
     try:
-        table = WebDriverWait(driver, 5).until(
+        WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.ID, table_id))
         )
         return True

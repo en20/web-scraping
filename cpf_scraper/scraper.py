@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import csv
 import os
-from utils.utils import process_all_tables
+from utils import process_all_tables
 
 def process_cpf(driver, cpf):
     """
