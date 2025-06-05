@@ -64,7 +64,7 @@ def main():
                     print(f"\n{'='*50}")
                     print(error_msg)
                     print(f"{'='*50}\n")
-                    failed_items.append((item, str(e)))
+                    failed_items.append((item, str("Erro durante o processamento")))
                     
             except Exception as e:
                 error_msg = f"Erro ao processar {search_type_name} {item}: {str(e)}"
